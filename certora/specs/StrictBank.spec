@@ -22,6 +22,9 @@ methods {
     function _.withdraw(uint256)                     external  => DISPATCHER(true);
 
     function tokenBalances(address) external returns (uint256) envfree;
+    function recordTransferIn(address token) external returns (uint256);
+    function StrictBank.afterTransferOut(address token) external;
+    //get CONTROLLEr Role
 }
 
 rule sanity_satisfy(method f) {
@@ -49,4 +52,46 @@ rule balanceIndependence(method f, env e, address token1, address token2) filter
 
     uint256 balanceAfter = tokenBalances(e, token2); 
     assert (token2 != token1 => balanceBefore == balanceAfter);
-} 
+}
+rule syncTokenBalanceSpec {
+    env e;
+    address token;
+    //require msg.sender hasRole onlyController
+    //require(hasRole(e.msg.sender, 0x97adf037b2472f4a6a9825eff7d2dd45e37f2dc308df2a260d6a72af4189a65b);
+
+    //alter the value of the token before checking because it initially zero
+
+    //assert tokenBalances of token == the balance of that token in the IERC20 after calling the syncTokenBalance function
+    uint realBalance = syncTokenBalance(e, token);
+
+    uint storedBalance = tokenBalances(token);
+    assert (storedBalance == realBalance);
+
+
+}
+
+rule recordTransferInSpec{
+    env e;
+    address token;
+    mathint prevBalance = tokenBalances(token);
+
+    mathint transferredAmount = recordTransferIn(e, token);
+    mathint expectedBalanceAfter = transferredAmount + prevBalance;
+    mathint balanceAfter = tokenBalances(token);
+
+    assert balanceAfter == expectedBalanceAfter;
+}
+
+rule afterTransferOut{
+    address token;
+    address bank;
+    env e;
+    
+    afterTransferOut(e, token);
+
+    mathint realValue = syncTokenBalance(e, token);
+    mathint expectedValue = tokenBalances(token);
+
+
+    assert realValue == expectedValue;
+}

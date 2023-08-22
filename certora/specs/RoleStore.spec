@@ -1,3 +1,4 @@
+
 rule sanity_satisfy(method f) {
     env e;
     calldataarg args;

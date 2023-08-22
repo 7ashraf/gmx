@@ -10,4 +10,6 @@ contract StrictBankHarness is StrictBank {
     function afterTransferOut(address token) external {
         _afterTransferOut(token);
     }
+
+    
 }

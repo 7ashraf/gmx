@@ -20,7 +20,7 @@ ghost mapping(bytes32 => uint256) ghostIndexes {
     init_state axiom forall bytes32 x. ghostIndexes[x] == 0;
 }
 ghost uint256 ghostLength {
-    // assumption: it's infeasible to grow the list to these many elements.
+    //# assumption: it's infeasible to grow the list to these many elements.
     axiom ghostLength < 0xffffffffffffffffffffffffffffffff;
 }
 

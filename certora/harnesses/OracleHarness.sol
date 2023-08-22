@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {Oracle, DataStore, EventEmitter, RoleStore, OracleStore} from "../../contracts/oracle/Oracle.sol";
 import {OracleUtils} from "../../contracts/oracle/OracleUtils.sol";
 import {Bits} from "../../contracts/utils/Bits.sol";
-
+import {Price} from "../../contracts/price/Price.sol";
 contract OracleHarness is Oracle {
 
     DataStore public immutable myDataStore;
@@ -83,4 +83,13 @@ contract OracleHarness is Oracle {
     ) external view {
         OracleUtils.validateSigner(SALT, myReportInfo, signature, expectedSigner);
     }
+
+    function getPriceFeedPrice(DataStore, address token) external view  returns (uint256){
+        (bool b, uint256 i) = super._getPriceFeedPrice(myDataStore, token);
+        return i;
+    }
+
+    
+
+    
 }

@@ -1,3 +1,4 @@
+using DataStore as ds;
 methods {
     // DataStore
     function _.getUint(bytes32) external => DISPATCHER(true);
@@ -20,6 +21,13 @@ methods {
     function OracleHarness.secondaryPrices(address) external returns (uint256,uint256);
     function OracleHarness.customPrices(address) external returns (uint256,uint256);
     function OracleHarness.getSignerByInfo(uint256, uint256) external returns (address);
+    function getTokensWithPrices(uint256, uint256) external  returns (address[] memory);
+    function getPriceFeedPrice(address dataStore, address token) external returns ( uint256);
+    function getPrimaryPrice(address token) external  returns (Price.Props memory);
+    function getTokensWithPricesCount() external  returns (uint256);
+    function clearAllPrices() external;
+    function getPrimaryPrice(address token) external returns (Price.Props memory);
+    function OracleHarness.etPriceFeedMultiplier(address dataStore, address token) external returns (uint256);
 }
 
 ghost mySalt() returns bytes32;
@@ -62,4 +70,71 @@ rule validateSignerConsistency() {
 
     assert (salt1 == salt2 && signer1 == signer2) => !lastReverted,
         "Revert characteristics of validateSigner are not consistent";
+}
+
+rule _getPriceFeedPriceSpec{
+    address dataStore;
+    address token;
+    env e;
+
+
+    uint256 price = getPriceFeedPrice(e, dataStore, token);
+
+    //assert price != 0;
+
+    assert price > 0;
+    //satisfy price == 0;
+
+}
+
+rule clearAllPricesSpec{
+    env e;
+    uint i;
+    uint256 maxBoundBefore = getTokensWithPricesCount(e);
+    address[] tokenWithPricesBefore = getTokensWithPrices(e,0, maxBoundBefore);
+    address token;
+    Price.Props propsBefore = getPrimaryPrice(e,token);
+    //(uint256 minBefore, uint256 maxBefore) = getPrimaryPrice(e,token);
+
+    clearAllPrices(e);
+
+    uint256 maxBound = getTokensWithPricesCount(e);
+    address[] tokenWithPrices = getTokensWithPrices(e,0, maxBound);
+    Price.Props props = getPrimaryPrice(e,token);
+    uint256 min = props.min;
+    uint256 max = props.max;
+    //(uint256 min, uint256 max) = getPrimaryPrice(e, token);
+    
+    //assert min ==0;
+    //assert max ==0;
+    assert i >=0 && i<maxBound => tokenWithPrices[i] == 0;
+    
+
+}
+
+rule getPrimaryPrice{
+    address token;
+    env e;
+
+    Price.Props props = getPrimaryPrice(e, token);
+
+    mathint min = props.min;
+    mathint max = props.max;
+
+
+    assert token == 0 => min == 0 && max == 0;
+    assert token != 0 => min > 0 && max > 0;
+
+
+}
+
+rule getPriceFeedMultiplier{
+
+    env e;
+    address dataStore;
+    address token;
+
+    uint256 mult = getPriceFeedMultiplier(e, dataStore, token);
+
+    assert mult > 0;
 }
