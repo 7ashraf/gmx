@@ -21,7 +21,6 @@ methods {
     function _.deposit()                             external  => DISPATCHER(true);
     function _.withdraw(uint256)                     external  => DISPATCHER(true);
 
-    function tokenBalances(address) external returns (uint256) envfree;
     function recordTransferIn(address token) external returns (uint256);
     function StrictBank.afterTransferOut(address token) external;
     //get CONTROLLEr Role

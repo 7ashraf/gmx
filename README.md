@@ -1,113 +1,190 @@
-# GMX Formal Verification Contest Details
-- Total Prize Pool: $40,000 USDC
-  - High/Medium awards: $22,000 USDC
-  - Coverage awards: $14,000 USDC
-  - Participation awards: $4,000 USDC
-- Join [C4 Discord](https://discord.gg/code4rena) to register
-- [Register](https://docs.google.com/forms/d/e/1FAIpQLSf7rGov3q0A_UNmKckv-tzR5snLGibZWF9y9dhgXUBZRZ0EVw/viewform) through Certora to gain access to the prover
-  - Resources to get familiar with the Certora Prover will be emailed to registrants along with their Certora key.
-- Learn about [GMX](https://github.com/gmx-io/gmx-synthetics)
-- Starts August 07, 2023 20:00 UTC
-- Ends August 28, 2023 20:00 UTC
 
-## Incentives
+# Navigating Software Reliability: My Formal Verification Odyssey with Certora Verification Language
 
-The total reward will be split into three categories: participation, bugs, and mutations. Participation rewards are distributed evenly amongst those catching all public mutations. Private mutations will be used to evaluate coverage. Bugs are rewarded using the [Code4rena incentive model](https://docs.code4rena.com/awarding/incentive-model-and-awards). Low, Informational, and Gas findings may be submitted but will not be considered for the reward. Severity will be determined by Certora using [Code4rena criteria](https://code4rena.com/judging-criteria/). Bug submissions require details such as impact, exploit scenario, mitigation and CVL property violated to be eligible for rewards. In the case that no high or medium findings, the coverage pool will be increased to 90%.
+## Introduction
 
-## Setup
+In the realm of software development, precision matters. This document chronicles my journey in a contest where I harnessed the Certora Verification Language to ensure software correctness.
 
-* [Import](https://github.com/new/import) this repository as a private repo and give access to teryanarmen and nd-certora. 
-* Add `CERTORAKEY` as a repository secret for CI. Work in the `certora` branch. 
-* Install the Certora Prover, instructions below.
-* Submit your work by creating a pull request from `certora` to `main` in your repo.
-* Note the Certora Prover [docs](docs.certora.com).
+Certora Verification Language acts as a translator between software and mathematical validation. This document outlines my verification methods, detailing strategies, Certora tools, code insights, challenges, and outcomes.
 
-## Scope
+My goal in sharing this experience is to underscore the potency of formal verification and inspire others in the software world to explore its application. Join me as we delve into the role of Certora in achieving dependable code and ushering in an era of trustworthy software systems.
 
-* Oracle.sol
-* OracleStore.sol
-* RoleStore.sol
-* DataStore.sol
-* StrictBank.sol
+## Problem Statement
 
-Oracle is more challenging to verify. Feel free to ask questions if you have any issues with the tool such as errors or timeouts. OracleStore has an example of how to use the specification for EnumerableSet, you can do something similar for RoleStore and DataStore.
+In the context of the gmx-formal-verification contest on Code4Arena, my mission was to use formal verification techniques to scrutinize code accuracy. I followed this approach:
 
-## Participation 
+1. Confirming input and output compliance with rules.
+2. Identifying peculiar scenarios.
+3. Validating logical behavior in the code.
+4. Investigating conditional statements that trigger transaction reversals.
 
-The `certora` directory that consists of 5 sub-directories - `harnesses`, `confs`, `mutations`, `helpers` and `specs`. These should contain the entire preliminary setup to allow you to start writing rules. Each sub-directory contains a different component of the verification project and may contain additional sub-directories to maintain organization. Try to keep a similar structure when adding new files.
+## Verification Methods
 
-Gather all the rules and invariants that you were able to verify in `<Contract>.spec` under `certora/specs`. Before submitting this spec, make sure to check the following things:
-* Ensure all properties are finished, reachable, and not timing out. Any properties not catching real bugs must also be passing.
-* Document each property.
-* It is recommended to inject bugs to test your properties.
+For each problem addressed, I adhered to this structure:
 
-For each real bug open an issue on your private repository with:
-* Short description of the problem
-* Impact
-* Expected and actual behaviors of the system
-* A concrete example of the exploit
-* CVL property violated 
+1. **Method Description**
+2. **Verification Strategy**
+3. **Utilized Certora Constructs**
+4. **Code Explanation**
+5. **Overcoming Challenges**
+6. **Final Outcomes**
 
-For properties that find real bugs, create `<Contract>Issues.spec` with only properties that catch bugs. For each of these specs, create a separate `.conf` file name `contract_violated.conf` Document each property with a short description of the attack vector found in the violation counter example with concrete values if possible. Also add a reference to the GitHub issue that further explains the bug.
+Next, I'll elaborate on the Certora rules employed, elucidate anticipated function logic and behavior, touch on exceptional scenarios and limitations, and substantiate how the rules formally ensure method efficacy.
 
-At the end of the formal verification contest, private mutations will be pushed to the public repo. Pull any changes from the public repo and open a pull request within your repository from the `certora` branch to the `main` branch. Upon opening the PR, the CI will be triggered, and the result will be evaluated by the judges.
+## Methods for Formal Verification
+
+### DataStore.sol
+
+#### applyDeltaToUint
+
+**Method Description:** This function alters a stored numerical value.
+
+**Verification Strategy:** Validate non-zero result and non-negative value.
+
+**Certora Constructs Used:** applyDeltaToUintSpec
+
+**Code Explanation:** The rule confirms the result is positive.
+
+### applyBoundedDeltaToUint
+
+**Method Description:** This function alters a stored number.
+
+**Verification Strategy:** Ensure non-negative number and, if input is negative, result must be zero.
+
+**Certora Constructs Used:** applyBoundedDeltaToUintSpec
+
+**Code Explanation:** This rule assures that the value increases and is accurately set.
+
+### incrementInt
+
+**Method Description:** Amplify a number by a specified value.
+
+**Verification Strategy:** Verify result is higher than the initial value.
+
+**Certora Constructs Used:** incrementIntSpec
+**Issue**: incrementInt
+**Summary**: the function allows incrementing by a negative value, thus giving anomaly behaviour
+
+**Code Explanation:** Rules validate that the new value increases and is in line with summation.
+
+### decrementInt
+
+**Method Description:** Diminish a number by a specified value.
+
+**Verification Strategy:** Ascertain result is lower than the initial value.
+
+**Certora Constructs Used:** decrementIntSpec
+
+**Code Explanation:** The rule affirms the expected reduction in number.
+**Issue**: decrementInt
+**Summary**: the function allows decrementing by a negative value, thus giving anomaly behaviour
+### incrementUint
+
+**Method Description:** Amplify a number by a specified value.
+
+**Verification Strategy:** Verify result is higher than the initial value.
+
+**Certora Constructs Used:** incrementUintSpec
+### decrementUint
+
+**Method Description:** Diminish a number by a specified value.
+
+**Verification Strategy:** Ascertain result is lower than the initial value.
+
+**Certora Constructs Used:** decrementUintSpec
+
+**Code Explanation:** The rule affirms the expected reduction in number.
+
+### _getPriceFeedPrice
+
+**Method Description:** Calculate and return a computed price.
+
+**Verification Strategy:** Validate non-negative, non-zero price.
+
+**Certora Constructs Used:** _getPriceFeedPriceSpec
+
+**Code Explanation:** Certora rules confirm price positivity and non-zero nature.
+
+### clearAllPrices
+
+**Method Description:** Delete token prices via a loop.
+
+**Verification Strategy:** Confirm tokens and associated prices are deleted.
+
+**Certora Constructs Used:** clearAllPricesSpec
+
+**Code Explanation:** Rules validate empty array and clearance of Price.Props structure.
+**Issue**: clearAllPrices
+**Summary**: the function doesn't use the counter i created in the for loop to loop on the array, thus deleting nothing but the first index
+
+### getPrimaryPrice
+
+**Method Description:** Retrieve a primary price.
+
+**Verification Strategy:** Validate token validity and handling of zero tokens.
+
+**Certora Constructs Used:** getPrimaryPriceSpec
+
+**Code Explanation:** Rules confirm valid tokens and handle cases when tokens are zero.
+
+### getPriceFeedMultiplier
+
+**Method Description:** Retrieve a multiplier from storage.
+
+**Verification Strategy:** Confirm multiplier is non-zero.
+
+**Certora Constructs Used:** getPriceFeedMultiplierSpec
+
+**Code Explanation:** Rules ensure multiplier's positivity.
+
+### syncTokenBalance
+
+**Method Description:** Synchronize stored balances with actual balances.
+
+**Verification Strategy:** Verify parity between stored and actual balances.
+
+**Certora Constructs Used:** syncTokenBalanceSpec
+
+**Code Explanation:** Rule confirms equality between stored and actual balances.
+
+### recordTransferIn
+
+**Method Description:** Log incoming transfers.
+
+**Verification Strategy:** Validate accurate recording of balance changes.
+
+**Certora Constructs Used:** recordTransferInSpec
+
+**Code Explanation:** Rules ensure that stored balances reflect real changes.
+
+### afterTransferOut
+
+**Method Description:** Update balances post-transfer.
+
+**Verification Strategy:** Validate correct update of balances.
+
+**Certora Constructs Used:** afterTransferOutSpec
+
+**Code Explanation:** Rules confirm proper update of stored balances.
+
+By methodically verifying each function, its logic, and behavior, Certora bolsters the reliability of software. This journey encountered challenges but proved enlightening, unveiling valuable insights and best practices.
+
+## Conclusion
+
+My exploration of formal verification through Certora has underscored the potential for building dependable software systems. By sharing my journey and lessons learned, I hope to inspire a wider embrace of formal verification methodologies. This document serves as a testament to the power of Certora Verification Language in enhancing software reliability.
 
 
-## Testing
 
-It is recommended to test your spec against the publicly available mutations to ensure your rules are working properly. You can use `check-all-mutations.sh`. This script will inject either the bugs injected by you or by certora one by one and run your spec against them.
+## Contact Information
 
-## Installation
+If you have any questions or would like to discuss formal verification further, feel free to reach out:
 
-### Installing Manually
+- Email: [muhamed.ashrafahmed@gmail.com](mailto:muhamed.ashrafahmed@gmail.com)
+- GitHub: [@7ashraf](https://github.com/7ashraf)
 
-Installation instructions can be found [here](https://docs.certora.com/en/latest/docs/user-guide/getting-started/install.html?highlight=install). Briefly, you must install
-* Node JS version >= 14.16.
-* Yarn version >= 1.22.
-* Java Development Kit version >= 11.
-* Solidity version 0.8.19.
-* One can install Certora with the Python package manager Pip3,
-  ```
-  pip3 install certora-cli
-  ```
-* Assuming you are in the root of this reposotory, install the remaining dependencies with
-  ```
-  yarn install
-  ```
+Thank you for joining me on this journey of software reliability!
 
-### Installing With Docker
+---
+*Document written by Mohamed Ashraf*
 
-There is a docker file in the `docker` folder, with instructions to create an environment with
-dependencies required for executing Certora. The container will be created with a user with
-username 'docker' and password 'docker'. On a Unix system with an sh shell, the docker container
-can be built with the `docker/build.sh` script. For example
-```
-docker/build.sh auto auto
-```
-builds the container with the docker user having the same user id and group id as the user executing
-the `build.sh` script. The user id and group id are inferred using the `id` command. This is the
-typical case.
-
-If one wants to specify the user id and/or group id manually, then that is also possible. The first
-argument to the `build.sh` script is the user id and the second argument is the group id,
-```
-docker/build.sh 1234 4321
-```
-
-When the container is built, then it can be started with the `docker/run.sh` script. For example
-```
-docker/run.sh "`realpath .`"
-```
-where the argument to `run.sh` is the absolute path to this repository (2023-08-gmx-fv).
-The repository will then be volume mapped for use inside the running docker container.
-
-IMPORTANT: The docker container is automatically removed after exiting, so that all changes to the
-container will be deleted. But since the repository 2023-08-gmx-fv is volume mapped inside
-the container, changes to the repository will be persistent, even after the docker container has
-exited.
-
-Inside the running docker container, go to the folder `~/2023-08-gmx-fv` and run
-```
-yarn install
-```
-to install the last dependencies.
+*Last updated: 28/08/2023*
