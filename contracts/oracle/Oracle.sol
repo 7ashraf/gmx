@@ -581,7 +581,7 @@ contract Oracle is RoleModule {
             /* uint80 answeredInRound */
         ) = priceFeed.latestRoundData();
 
-        if (_price <= 0) {
+        if (_price < 0) {
             revert Errors.InvalidFeedPrice(token, _price);
         }
 

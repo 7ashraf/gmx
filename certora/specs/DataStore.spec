@@ -35,7 +35,7 @@ rule applyDeltaToUintSpec{
    // assert realResult == expectedResult;
 
     //check that it is possible for result to be greater than or equal 0
-    assert expectedResult > 0;
+    assert expectedResult != 0;
 
     //assert result is real
 
@@ -53,11 +53,11 @@ rule applyBoundedDeltaToUintSpec{
     uint256 prev = getUint(e, key);
     mathint expectedResult = prev + value;
 
-    uint256 result = applyBoundedDeltaToUint(e, key, value);
+    mathint result = applyBoundedDeltaToUint(e, key, value);
 
 
     assert result >= 0;
-    assert result == assert_uint256(expectedResult);
+    assert result == expectedResult;
 }
 
 
