@@ -37,6 +37,8 @@ rule applyDeltaToUintSpec{
     //check that it is possible for result to be greater than or equal 0
     assert expectedResult > 0;
 
+    //assert result is real
+
 
    
 
